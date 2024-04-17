@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  server:
+    container_name: server
+    build: .
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FILE=${LOG_FILE}
+      - CONNECTION_STRING=${CONNECTION_STRING}
+    ports:
+      - 8000:8000
+    restart: on-failure
+    depends_on:
+      - db
+    networks:
+      - fleetman
+
+  db:
+    platform: "linux/amd64"
+    image: mysql
+    container_name: db
+    environment:
+      MYSQL_USER: admiral
+      MYSQL_PASSWORD: supersecret
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: fleetman
+    ports:
+      - "3306:3306"
+    restart: always
+    volumes:
+      - mysqldb:/var/lib/mysql
+    networks:
+      - fleetman
+
+volumes:
+  mysqldb:
+
+networks:
+  fleetman:
+    driver: bridge
